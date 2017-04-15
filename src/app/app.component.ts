@@ -16,6 +16,8 @@ import { Builder } from 'escher-vis';
 export class AppComponent {
 	title = 'app works!';
 
+	fileTypes = ".jpg";
+
 	data: any;
 	model: any;
 
@@ -34,5 +36,9 @@ export class AppComponent {
 					this.model = second;
 				});
 			});
+	}
+
+	fileUploaded(file: File): void {
+		console.log(file);
 	}
 }

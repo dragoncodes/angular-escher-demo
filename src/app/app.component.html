@@ -2,4 +2,6 @@
   {{title}}
 </h1>
 
+<file-upload (onFileUpload)="fileUploaded($event)" [fileTypes]="fileTypes"></file-upload>
+
 <escher [escherData]="data" [escherModel]="model"></escher>

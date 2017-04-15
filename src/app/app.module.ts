@@ -5,11 +5,13 @@ import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { EscherComponent } from './escher/escher.component';
+import { FileUploadComponent } from './file-upload/file-upload.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    EscherComponent
+    EscherComponent,
+    FileUploadComponent
   ],
   imports: [
     BrowserModule,
