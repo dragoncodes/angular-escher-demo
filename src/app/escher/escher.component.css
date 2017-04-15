@@ -1,0 +1,9 @@
+.escher-holder {
+    height: 35em;
+}
+
+svg.escher-svg {
+    width: 100%!important;
+    height: 100%!important;
+    overflow: hidden;
+}
