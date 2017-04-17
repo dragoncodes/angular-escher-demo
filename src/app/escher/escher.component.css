@@ -1,8 +1,13 @@
 .escher-holder {
+    height: 40em;
+    overflow: hidden;
+}
+
+.escher-holder /deep/ .escher-3d-transform-container {
     height: 35em;
 }
 
-svg.escher-svg {
+ .escher-holder /deep/ svg.escher-svg {
     width: 100%!important;
     height: 100%!important;
     overflow: hidden;

@@ -1,0 +1,5 @@
+<div>
+  <div *ngFor="let key of dictionaryKeys()">
+    <node-type [name]="key" [node]="analyticsData[key]"></node-type>
+  </div>
+</div>

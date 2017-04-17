@@ -1,1 +1,11 @@
-<div #escherHolder class="escher-holder"></div>
+<button *ngIf="!!escherData" (click)="switchColorScheme($event)">{{this.nextColorText}}</button>
+
+<div #escherHolder class="escher-holder col-md-6 col-sm-6"></div>
+
+<div *ngIf="analyticsShown" class="col-md-6 col-sm-6">
+    <div *ngIf="!!fromNodeName">
+        {{fromNodeName}} -> {{toNodeName}}
+    </div>
+    <h1 class="analytics-heading">Data Analysis</h1>
+    <escher-data [analyticsData]="analyticsData"></escher-data>
+</div>
