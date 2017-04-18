@@ -1,1 +1,12 @@
-{{name}} - {{node.count}}
+<div class="node-type-holder">
+    {{name}} - {{nodeData.count}}
+    <span (click)="expandInfo($event)">
+       {{infoExpanded ? "&#x22B2;" : "&#x22B3;"}} 
+    </span>
+
+    <div *ngIf="infoExpanded" class="additional-info">
+        <div *ngFor="let node of nodeData.nodes">
+            {{node.node_id}}&thinsp;{{node.name}}&thinsp;{{node.bigg_id}}
+        </div>
+    </div>
+</div>

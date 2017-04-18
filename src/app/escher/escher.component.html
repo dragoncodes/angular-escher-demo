@@ -3,9 +3,22 @@
 <div #escherHolder class="escher-holder col-md-6 col-sm-6"></div>
 
 <div *ngIf="analyticsShown" class="col-md-6 col-sm-6">
-    <div *ngIf="!!fromNodeName">
-        {{fromNodeName}} -> {{toNodeName}}
+    <div>
+
+        <div class="from-to-holder" *ngIf="!!fromNodeName">
+            From {{fromNodeName}} to {{toNodeName}}
+        </div>
+
+        <div *ngIf="fromNodeNames?.length > 0">
+            Possible Paths:
+            <div *ngFor="let fromNode of fromNodeNames">
+                <div *ngFor="let toNode of toNodeNames">
+                    {{fromNode}} -> {{toNode}}
+                </div>
+            </div>
+        </div>
+
     </div>
     <h1 class="analytics-heading">Data Analysis</h1>
-    <escher-data [analyticsData]="analyticsData"></escher-data>
+    <app-escher-data [analyticsData]="analyticsData"></app-escher-data>
 </div>

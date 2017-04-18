@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, NgZone } from '@angular/core';
 import { Http } from '@angular/http';
 import { Builder } from 'escher-vis';
 
@@ -9,17 +9,20 @@ import * as d3 from 'd3';
 declare var $: any;
 
 @Component({
-	selector: 'escher',
+	selector: 'app-escher',
 	templateUrl: './escher.component.html',
 	styleUrls: ['./escher.component.css']
 })
 export class EscherComponent implements OnInit {
 
-	public styleOverriden: boolean = false;
-	public nextColorText: string = 'Green';
+	public styleOverriden = false;
+	public nextColorText = 'Green';
 
-	public analyticsShown: boolean = false;
+	public analyticsShown = false;
 	public analyticsData: NodeDictionary;
+
+	private fromNodeNames: string[];
+	private toNodeNames: string[];
 
 	private fromNodeName: string;
 	private toNodeName: string;
@@ -37,13 +40,13 @@ export class EscherComponent implements OnInit {
 	private escherSvgData: {
 		canvas: Object;
 		nodes: { [nodeId: string]: EscherNode };
-		reaction: { [reactionId: string]: Reaction }
-	}
+		reactions: { [reactionId: string]: Reaction }
+	};
 
 	@ViewChild('escherHolder') escherHolder;
 	@Input() private options: any;
 
-	constructor() { }
+	constructor(private zone: NgZone) { }
 
 	@Input()
 	public set escherData(value: Object) {
@@ -61,11 +64,16 @@ export class EscherComponent implements OnInit {
 	}
 
 	calculations(data: EscherNodeDictionary) {
-		let analyticsData = <NodeDictionary>{};
+		const analyticsData = <NodeDictionary>{};
 
-		for (let key in data) {
-			let node: EscherNode = data[key];
-			let nodeType = node.node_type;
+		for (const key in data) {
+
+			if (!data.hasOwnProperty(key)) {
+				continue;
+			}
+
+			const node: EscherNode = data[key];
+			const nodeType = node.node_type;
 
 			if (!analyticsData[nodeType]) {
 				analyticsData[nodeType] = {
@@ -111,27 +119,116 @@ export class EscherComponent implements OnInit {
 			fill_screen: true,
 			first_load_callback: this.onModelLoaded.bind(this)
 			// TODO ADD SOME OPTIONS FOR ALL CASES HERE
-		}
+		};
 	}
 
-	onSegmentClicked(segment: ReactionSegment): void {
+	onSegmentClicked(segment: ReactionSegment, reaction: Reaction): void {
 
-		this.fromNodeName = this.escherSvgData.nodes[segment.from_node_id].name || 'unknown';
+		const nodes = this.escherSvgData.nodes;
 
-		this.toNodeName = this.escherSvgData.nodes[segment.to_node_id].name || 'unknown';
+		this.fromNodeName = nodes[segment.from_node_id].name || `${segment.from_node_id}`;
+		this.toNodeName = nodes[segment.to_node_id].name || `${segment.to_node_coefficient}`;
+
+		const segments = reaction.segments;
+		const segmentKeys = Object.keys(segments);
+
+		const workSegments: ReactionSegment[] = [];
+
+		for (let i = 0; i < segmentKeys.length; i++) {
+			const segment = segments[segmentKeys[i]];
+			if (!!segment.b1) {
+				workSegments.push(segment);
+			}
+		}
+
+		workSegments.sort((segmentA, segmentB) => {
+			return segmentB.b1.x - segmentA.b1.x;
+		});
+
+		const toNodeNames = [];
+		const fromNodeNames = [];
+
+		const tempB1 = <{
+			x: number;
+			y: number;
+		}>{ x: 0, y: 0 };
+
+		if (!segment.b1) {
+			const arrCoords = $('#s' + `${segment.segment_id} path`).attr('d').split(' ')[0].replace('M', '').split(',');
+			tempB1.x = arrCoords[0];
+			tempB1.y = arrCoords[1];
+		} else {
+			tempB1.x = segment.b1.x;
+			tempB1.y = segment.b1.y;
+		}
+
+		const fromCoef = (segment.from_node_coefficient || 1);
+
+		if (workSegments.length > 1) {
+
+			for (let i = 0; i < workSegments.length; i++) {
+
+				const delta = tempB1.x - workSegments[i].b1.x;
+
+				if (fromCoef < 0) {
+					if (delta < 0) {
+						continue;
+					}
+				}
+
+				// console.log(this.escherSvgData.nodes[workSegments[i].from_node_id].name, this.escherSvgData.nodes[workSegments[i].to_node_id].name);
+				// console.log(tempB1.x, workSegments[i].b1.x);
+
+				const fromName = nodes[workSegments[i].from_node_id].name;
+				const toName = nodes[workSegments[i].to_node_id].name;
+
+				if (!!fromName) {
+					fromNodeNames.push(fromName);
+				} else if (!!toName) {
+					toNodeNames.push(toName);
+				}
+			}
+		} else {
+			// Easy out
+
+			fromNodeNames.push(nodes[workSegments[0].from_node_id].name);
+			toNodeNames.push(fromNodeNames[0]);
+		}
+
+		this.zone.run(() => {
+
+			if (toNodeNames.length === 0 && reaction.reversibility) {
+				toNodeNames.push(fromNodeNames[0]);
+			}
+
+			this.fromNodeNames = fromNodeNames;
+			this.toNodeNames = toNodeNames;
+		});
 	}
 
 	onModelLoaded(): void {
 
-		this.calculations(this.escherData[1].nodes);
+		this.calculations(this.escherSvgData.nodes);
 
-		let reactions = this.escherData[1].reactions;
+		const reactions = this.escherSvgData.reactions;
 
-		for (var reactionKey in reactions) {
-			let segments: { [segmentKey: string]: ReactionSegment } = reactions[reactionKey].segments;
+		for (const reactionKey in reactions) {
 
-			for (var segmentKey in segments) {
-				$('#s' + segmentKey).on('click', this.onSegmentClicked.bind(this, segments[segmentKey]));
+			if (!reactions.hasOwnProperty(reactionKey)) {
+				continue;
+			}
+
+			const reaction = reactions[reactionKey];
+
+			const segments: { [segmentKey: string]: ReactionSegment } = reaction.segments;
+
+			for (const segmentKey in segments) {
+
+				if (!segments.hasOwnProperty(segmentKey)) {
+					continue;
+				}
+
+				$('#s' + segmentKey).on('click', this.onSegmentClicked.bind(this, segments[segmentKey], reaction));
 			}
 		}
 	}

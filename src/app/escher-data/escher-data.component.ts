@@ -3,7 +3,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { NodeDictionary } from '../models/escher';
 
 @Component({
-	selector: 'escher-data',
+	selector: 'app-escher-data',
 	templateUrl: './escher-data.component.html',
 	styleUrls: ['./escher-data.component.css']
 })

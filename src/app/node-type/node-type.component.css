@@ -1,0 +1,9 @@
+.additional-info {
+    height: 20em;
+    overflow: auto;
+}
+
+.node-type-holder {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
