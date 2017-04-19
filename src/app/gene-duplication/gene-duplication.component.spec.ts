@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FileUploadComponent } from './file-upload.component';
+import { GeneDuplicationComponent } from './gene-duplication.component';
 
-describe('FileUploadComponent', () => {
-	let component: FileUploadComponent;
-	let fixture: ComponentFixture<FileUploadComponent>;
+describe('GeneDuplicationComponent', () => {
+	let component: GeneDuplicationComponent;
+	let fixture: ComponentFixture<GeneDuplicationComponent>;
 
 	beforeEach(async(() => {
 		TestBed.configureTestingModule({
-			declarations: [FileUploadComponent]
+			declarations: [GeneDuplicationComponent]
 		})
 			.compileComponents();
 	}));
 
 	beforeEach(() => {
-		fixture = TestBed.createComponent(FileUploadComponent);
+		fixture = TestBed.createComponent(GeneDuplicationComponent);
 		component = fixture.componentInstance;
 		fixture.detectChanges();
 	});

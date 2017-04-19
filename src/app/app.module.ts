@@ -8,21 +8,23 @@ import { EscherComponent } from './escher/escher.component';
 import { FileUploadComponent } from './file-upload/file-upload.component';
 import { EscherDataComponent } from './escher-data/escher-data.component';
 import { NodeTypeComponent } from './node-type/node-type.component';
+import { GeneDuplicationComponent } from './gene-duplication/gene-duplication.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    EscherComponent,
-    FileUploadComponent,
-    EscherDataComponent,
-    NodeTypeComponent
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+	declarations: [
+		AppComponent,
+		EscherComponent,
+		FileUploadComponent,
+		EscherDataComponent,
+		NodeTypeComponent,
+		GeneDuplicationComponent
+	],
+	imports: [
+		BrowserModule,
+		FormsModule,
+		HttpModule
+	],
+	providers: [],
+	bootstrap: [AppComponent]
 })
 export class AppModule { }

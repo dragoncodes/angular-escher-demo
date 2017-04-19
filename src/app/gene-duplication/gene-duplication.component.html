@@ -1,0 +1,17 @@
+<div class="gene-duplication-holder">
+    [ {{geneDuplicationData.gene.bigg_id}} ] {{geneDuplicationData.gene.name}} in {{geneDuplicationData.reactionIds.length}}
+    reactions
+
+    <span (click)="expandInfo($event)" class="info-expander">
+       {{infoExpanded ? "&#x22B2;" : "&#x22B3;"}} 
+    </span>
+
+    <div *ngIf="infoExpanded" class="additional-info">
+
+        Reactions: 
+
+        <div *ngFor="let reactionId of geneDuplicationData.reactionIds">
+            [ {{reactions[reactionId].bigg_id}} ] {{reactions[reactionId].name}}
+        </div>
+    </div>
+</div>

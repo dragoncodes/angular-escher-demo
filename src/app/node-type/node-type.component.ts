@@ -11,13 +11,13 @@ export class NodeTypeComponent implements OnInit {
 	@Input() public name: string;
 	@Input() public nodeData: NodeData;
 
-	private infoExpanded: boolean;
+	public infoExpanded: boolean;
 
 	constructor() {
 		this.infoExpanded = false;
 	}
 
-	expandInfo() {
+	expandInfo(event: Event) {
 		this.infoExpanded = !this.infoExpanded;
 	}
 

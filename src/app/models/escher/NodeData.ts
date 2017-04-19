@@ -1,11 +1,11 @@
 import { EscherNode } from './EscherNode';
 
 export interface NodeData {
-    count: number;
+	count: number;
 
-    nodes: EscherNode[]
+	nodes: EscherNode[];
 }
 
-export type NodeDictionary = {
-    [nodeType: string]: NodeData
-}
+export interface NodeDictionary {
+	[nodeType: string]: NodeData;
+};

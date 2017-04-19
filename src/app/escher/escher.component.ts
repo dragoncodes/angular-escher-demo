@@ -2,7 +2,16 @@ import { Component, OnInit, ViewChild, Input, NgZone } from '@angular/core';
 import { Http } from '@angular/http';
 import { Builder } from 'escher-vis';
 
-import { EscherNodeDictionary, EscherNode, NodeDictionary, ReactionSegment, Reaction } from '../models/escher';
+import {
+	EscherNodeDictionary,
+	EscherNode,
+	NodeDictionary,
+	ReactionSegment,
+	Reaction,
+	Gene,
+	ReactionDictionary,
+	GeneDuplicationDictionary
+} from '../models/escher';
 
 import * as d3 from 'd3';
 
@@ -15,19 +24,28 @@ declare var $: any;
 })
 export class EscherComponent implements OnInit {
 
+	// Svg related
 	public styleOverriden = false;
 	public nextColorText = 'Green';
 
+	// EscherDataComponent related
 	public analyticsShown = false;
 	public analyticsData: NodeDictionary;
+	public geneDuplicationData: GeneDuplicationDictionary;
 
+	// Possible nodes connecting path clicked
 	private fromNodeNames: string[];
 	private toNodeNames: string[];
 
+	// Simple from-to node
+	// Some nodes are missing a name
 	private fromNodeName: string;
 	private toNodeName: string;
 
-	private _escherRawData: any;
+	@ViewChild('escherHolder') escherHolder;
+	@Input() private options: any;
+
+	private _escherRawData: Object;
 
 	private escherMetadata: {
 		homepage: string;
@@ -40,11 +58,8 @@ export class EscherComponent implements OnInit {
 	private escherSvgData: {
 		canvas: Object;
 		nodes: { [nodeId: string]: EscherNode };
-		reactions: { [reactionId: string]: Reaction }
+		reactions: ReactionDictionary;
 	};
-
-	@ViewChild('escherHolder') escherHolder;
-	@Input() private options: any;
 
 	constructor(private zone: NgZone) { }
 
@@ -63,7 +78,7 @@ export class EscherComponent implements OnInit {
 		return this._escherRawData;
 	}
 
-	calculations(data: EscherNodeDictionary) {
+	calculateCountPerNodeType(data: EscherNodeDictionary) {
 		const analyticsData = <NodeDictionary>{};
 
 		for (const key in data) {
@@ -103,7 +118,7 @@ export class EscherComponent implements OnInit {
 	}
 
 	tryBuildingMap(): void {
-		if (this._escherRawData) {
+		if (this._escherRawData && this._escherRawData[0] && this._escherRawData[1]) {
 
 			this.escherMetadata = this._escherRawData[0];
 			this.escherSvgData = this._escherRawData[1];
@@ -114,11 +129,10 @@ export class EscherComponent implements OnInit {
 
 	getOptions(): Object {
 		return {
-			...this.options,
 			menu: 'zoom',
+			...this.options,
 			fill_screen: true,
 			first_load_callback: this.onModelLoaded.bind(this)
-			// TODO ADD SOME OPTIONS FOR ALL CASES HERE
 		};
 	}
 
@@ -135,9 +149,9 @@ export class EscherComponent implements OnInit {
 		const workSegments: ReactionSegment[] = [];
 
 		for (let i = 0; i < segmentKeys.length; i++) {
-			const segment = segments[segmentKeys[i]];
-			if (!!segment.b1) {
-				workSegments.push(segment);
+			const curSegment = segments[segmentKeys[i]];
+			if (!!curSegment.b1) {
+				workSegments.push(curSegment);
 			}
 		}
 
@@ -206,9 +220,47 @@ export class EscherComponent implements OnInit {
 		});
 	}
 
+	calculateGenesDuplications(reactions: { [reactionId: string]: Reaction }): void {
+		const genesRes: GeneDuplicationDictionary = {};
+
+		const reactionKeys: string[] = Object.keys(reactions);
+
+		for (let i = 0; i < reactionKeys.length; i++) {
+			const reaction = reactions[reactionKeys[i]];
+			const genes: Gene[] = reaction.genes;
+
+			for (let j = 0; j < genes.length; j++) {
+				const gene = genes[j];
+				if (!genesRes[gene.bigg_id]) {
+					genesRes[gene.bigg_id] = {
+						gene: gene,
+						reactionIds: []
+					};
+				}
+
+				if (genesRes[gene.bigg_id].reactionIds.indexOf(reactionKeys[i]) === -1) {
+					genesRes[gene.bigg_id].reactionIds.push(reactionKeys[i]);
+				}
+			}
+		}
+
+		for (const geneKey in genesRes) {
+			if (!genesRes.hasOwnProperty(geneKey)) {
+				continue;
+			}
+
+			if (genesRes[geneKey].reactionIds.length < 2) {
+				delete genesRes[geneKey];
+			}
+		}
+
+		this.geneDuplicationData = genesRes;
+	}
+
 	onModelLoaded(): void {
 
-		this.calculations(this.escherSvgData.nodes);
+		this.calculateCountPerNodeType(this.escherSvgData.nodes);
+		this.calculateGenesDuplications(this.escherSvgData.reactions);
 
 		const reactions = this.escherSvgData.reactions;
 

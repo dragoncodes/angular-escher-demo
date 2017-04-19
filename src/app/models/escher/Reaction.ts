@@ -5,9 +5,16 @@ export interface Reaction {
 	reversibility: boolean;
 	name: string;
 
+	genes: Gene[];
+
 	segments: {
 		[segmentId: string]: ReactionSegment;
 	};
+}
+
+export interface Gene {
+	bigg_id: string;
+	name: string;
 }
 
 export interface ReactionSegment {
@@ -29,4 +36,8 @@ export interface ReactionSegment {
 	from_node_id: number;
 	to_node_id: number;
 	reversibility: boolean;
+}
+
+export interface ReactionDictionary {
+	[reactionId: string]: Reaction;
 }

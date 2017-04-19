@@ -3,3 +3,12 @@ body, height {
     width: 100%;
     height: 100%;
 }
+
+.info-expander {
+    cursor: pointer;
+}
+
+.analytics-sub-heading {
+    font-weight: 500;
+    font-size: 1.4em;
+}

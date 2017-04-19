@@ -1,0 +1,10 @@
+.additional-info {
+    max-height: 10em;
+    border: 1px solid #000;
+    overflow: auto;
+
+    padding: .5em;
+
+    margin-bottom: 1.3em;
+    margin-top: 1.3em;
+}
