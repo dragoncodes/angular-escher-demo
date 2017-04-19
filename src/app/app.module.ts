@@ -10,6 +10,8 @@ import { EscherDataComponent } from './escher-data/escher-data.component';
 import { NodeTypeComponent } from './node-type/node-type.component';
 import { GeneDuplicationComponent } from './gene-duplication/gene-duplication.component';
 
+import { EscherDataService } from './services/escher-data';
+
 @NgModule({
 	declarations: [
 		AppComponent,
@@ -24,7 +26,7 @@ import { GeneDuplicationComponent } from './gene-duplication/gene-duplication.co
 		FormsModule,
 		HttpModule
 	],
-	providers: [],
+	providers: [EscherDataService],
 	bootstrap: [AppComponent]
 })
 export class AppModule { }

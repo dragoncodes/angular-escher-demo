@@ -12,6 +12,6 @@
   <div class="analytics-sub-heading">Genes part of multiple reactions</div>
 
   <div *ngFor="let geneKey of dictionaryKeys(geneDuplicationData)">
-    <app-gene-duplication [geneDuplicationData]="geneDuplicationData[geneKey]" [reactions]="reactions"></app-gene-duplication>
+    <app-gene-duplication [geneDuplicationData]="geneDuplicationData[geneKey]"></app-gene-duplication>
   </div>
 </div>

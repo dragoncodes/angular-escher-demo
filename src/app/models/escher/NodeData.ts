@@ -1,4 +1,4 @@
-import { EscherNode } from './EscherNode';
+import { EscherNode } from './';
 
 export interface NodeData {
 	count: number;

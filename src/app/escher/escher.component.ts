@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, Input, NgZone } from '@angular/core';
 import { Http } from '@angular/http';
+import { EscherDataService } from '../services/escher-data';
 import { Builder } from 'escher-vis';
 
 import {
@@ -10,6 +11,7 @@ import {
 	Reaction,
 	Gene,
 	ReactionDictionary,
+	EscherCoreData,
 	GeneDuplicationDictionary
 } from '../models/escher';
 
@@ -23,6 +25,8 @@ declare var $: any;
 	styleUrls: ['./escher.component.css']
 })
 export class EscherComponent implements OnInit {
+
+	private escherData: EscherCoreData;
 
 	// Svg related
 	public styleOverriden = false;
@@ -45,38 +49,7 @@ export class EscherComponent implements OnInit {
 	@ViewChild('escherHolder') escherHolder;
 	@Input() private options: any;
 
-	private _escherRawData: Object;
-
-	private escherMetadata: {
-		homepage: string;
-		map_description: string;
-		map_id: string;
-		map_name: string;
-		schema: string;
-	};
-
-	private escherSvgData: {
-		canvas: Object;
-		nodes: { [nodeId: string]: EscherNode };
-		reactions: ReactionDictionary;
-	};
-
-	constructor(private zone: NgZone) { }
-
-	@Input()
-	public set escherData(value: Object) {
-		this._escherRawData = value;
-
-		if (value) {
-			this.analyticsShown = true;
-		}
-
-		this.tryBuildingMap();
-	}
-
-	public get escherData(): Object {
-		return this._escherRawData;
-	}
+	constructor(private zone: NgZone, private escherDataService: EscherDataService) { }
 
 	calculateCountPerNodeType(data: EscherNodeDictionary) {
 		const analyticsData = <NodeDictionary>{};
@@ -118,13 +91,7 @@ export class EscherComponent implements OnInit {
 	}
 
 	tryBuildingMap(): void {
-		if (this._escherRawData && this._escherRawData[0] && this._escherRawData[1]) {
-
-			this.escherMetadata = this._escherRawData[0];
-			this.escherSvgData = this._escherRawData[1];
-
-			Builder(this._escherRawData, null, null, this.escherHolder.nativeElement, this.getOptions());
-		}
+		Builder(this.escherDataService.rawData, null, null, this.escherHolder.nativeElement, this.getOptions());
 	}
 
 	getOptions(): Object {
@@ -138,10 +105,13 @@ export class EscherComponent implements OnInit {
 
 	onSegmentClicked(segment: ReactionSegment, reaction: Reaction): void {
 
-		const nodes = this.escherSvgData.nodes;
+		const nodes = this.escherData.nodes;
 
 		this.fromNodeName = nodes[segment.from_node_id].name || `${segment.from_node_id}`;
 		this.toNodeName = nodes[segment.to_node_id].name || `${segment.to_node_coefficient}`;
+
+		// TODO This needs improvement
+		// Doesn't work in all cases
 
 		const segments = reaction.segments;
 		const segmentKeys = Object.keys(segments);
@@ -189,9 +159,6 @@ export class EscherComponent implements OnInit {
 						continue;
 					}
 				}
-
-				// console.log(this.escherSvgData.nodes[workSegments[i].from_node_id].name, this.escherSvgData.nodes[workSegments[i].to_node_id].name);
-				// console.log(tempB1.x, workSegments[i].b1.x);
 
 				const fromName = nodes[workSegments[i].from_node_id].name;
 				const toName = nodes[workSegments[i].to_node_id].name;
@@ -259,10 +226,10 @@ export class EscherComponent implements OnInit {
 
 	onModelLoaded(): void {
 
-		this.calculateCountPerNodeType(this.escherSvgData.nodes);
-		this.calculateGenesDuplications(this.escherSvgData.reactions);
+		this.calculateCountPerNodeType(this.escherData.nodes);
+		this.calculateGenesDuplications(this.escherData.reactions);
 
-		const reactions = this.escherSvgData.reactions;
+		const reactions = this.escherData.reactions;
 
 		for (const reactionKey in reactions) {
 
@@ -286,6 +253,14 @@ export class EscherComponent implements OnInit {
 	}
 
 	ngOnInit() {
+
+		const escherData = this.escherData = this.escherDataService.coreData;
+
+		if (escherData) {
+			this.analyticsShown = true;
+		}
+
+		this.tryBuildingMap();
 	}
 }
 

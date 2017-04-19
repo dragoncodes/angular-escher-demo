@@ -1,4 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
+
+import { EscherDataService } from '../services/escher-data';
+
 import { GeneDuplicationDictionary, ReactionDictionary, GeneDuplicationObject } from '../models/escher';
 
 @Component({
@@ -8,19 +11,19 @@ import { GeneDuplicationDictionary, ReactionDictionary, GeneDuplicationObject } 
 })
 export class GeneDuplicationComponent implements OnInit {
 
-	@Input() public reactions: ReactionDictionary;
+	public reactions: ReactionDictionary;
 	@Input() public geneDuplicationData: GeneDuplicationObject;
 
 	public infoExpanded: boolean;
 
-	constructor() { }
+	constructor(private escherDataService: EscherDataService) { }
 
 	expandInfo(event: Event) {
 		this.infoExpanded = !this.infoExpanded;
 	}
 
 	ngOnInit() {
+		this.reactions = this.escherDataService.coreData.reactions;
 		this.infoExpanded = false;
 	}
-
 }

@@ -1,6 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 
-import { NodeDictionary, GeneDuplicationDictionary, Gene, Reaction, ReactionDictionary } from '../models/escher';
+import { EscherDataService } from '../services/escher-data';
+
+import { NodeDictionary, GeneDuplicationDictionary, Gene, Reaction, ReactionDictionary, } from '../models/escher';
 
 @Component({
 	selector: 'app-escher-data',
@@ -11,14 +13,16 @@ export class EscherDataComponent implements OnInit {
 
 	@Input() public analyticsData: NodeDictionary;
 	@Input() public geneDuplicationData: GeneDuplicationDictionary;
-	@Input() public reactions: ReactionDictionary;
+
+	public reactions: ReactionDictionary;
 
 	dictionaryKeys(dictionary): string[] {
 		return Object.keys(dictionary);
 	}
 
-	constructor() { }
+	constructor(private escherDataService: EscherDataService) { }
 
 	ngOnInit() {
+		this.reactions = this.escherDataService.coreData.reactions;
 	}
 }

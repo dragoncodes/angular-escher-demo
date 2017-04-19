@@ -1,5 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 
+import { EscherDataService } from './services/escher-data';
+
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
@@ -9,7 +11,7 @@ export class AppComponent {
 
 	data: any;
 
-	constructor(private zone: NgZone) {
+	constructor(private zone: NgZone, private escherDataService: EscherDataService) {
 
 	}
 
@@ -18,7 +20,10 @@ export class AppComponent {
 
 		fileReader.onload = (loadEvent: ProgressEvent) => {
 			this.zone.run(() => {
+
 				this.data = JSON.parse(fileReader.result);
+				this.escherDataService.rawData = this.data;
+
 			});
 		};
 

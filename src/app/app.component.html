@@ -1,4 +1,5 @@
 <div class="container">
     <app-file-upload [fileTypes]="'.json'" (onFileUpload)="fileUploaded($event)"></app-file-upload>
-    <app-escher class="col-md-12" [escherData]="data"></app-escher>
+
+    <app-escher *ngIf="!!data" class="col-md-12"></app-escher>
 </div>

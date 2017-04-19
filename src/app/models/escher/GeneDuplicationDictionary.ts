@@ -1,4 +1,4 @@
-import { Gene } from './Reaction';
+import { Gene } from './';
 
 export interface GeneDuplicationObject {
 	gene: Gene;
