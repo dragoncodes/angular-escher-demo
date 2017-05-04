@@ -2,6 +2,9 @@
 
 Demo project featuring [Escher](http://escher.github.io/) and Angular2 Cli
 
+# Maps
+You can get the json files (maps) from http://escher.github.io/
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
